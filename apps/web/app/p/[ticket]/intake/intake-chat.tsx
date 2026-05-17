@@ -10,6 +10,7 @@ import type { IntakeMessage, IntakeSession, TicketDetail } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { ExtractedChips } from './extracted-chips';
 import { PhotoAttach } from './photo-attach';
+import { QuickReplies } from './quick-replies';
 import { VoiceButton } from './voice-button';
 
 interface Props {
@@ -166,6 +167,25 @@ export function IntakeChat({ ticket, poliLabel }: Props) {
               isFollowup={ticket.is_followup}
             />
           )}
+          {!sending && (() => {
+            const lastAgent = [...(visibleMessages || [])]
+              .reverse()
+              .find((m) => m.role === 'agent');
+            const lang: 'en' | 'id' = session?.language === 'id' ? 'id' : 'en';
+            return (
+              <QuickReplies
+                agentMessage={lastAgent?.content}
+                language={lang}
+                onPick={(text) => {
+                  setInput((cur) =>
+                    cur.trim().length === 0
+                      ? text
+                      : `${cur.trim()} ${text}`.trim()
+                  );
+                }}
+              />
+            );
+          })()}
           <div className="relative px-4 py-3 border-t border-ink-100 bg-white">
             <div className="flex items-end gap-2">
               <PhotoAttach
