@@ -139,3 +139,34 @@ html, body {
   50%      { box-shadow: 0 0 0 12px rgba(16,185,129,0), inset 0 0 0 2px rgba(255,255,255,0.04); }
 }
 .next-up-glow { animation: next-up-glow 1.8s ease-out infinite; }
+
+/* === Accessibility opt-ins (toggled by AccessibilityToggle) === */
+html.a11y-text-lg  { font-size: 112.5%; }
+html.a11y-text-xl  { font-size: 125%;   }
+
+html.a11y-font-readable,
+html.a11y-font-readable body,
+html.a11y-font-readable button,
+html.a11y-font-readable input,
+html.a11y-font-readable textarea,
+html.a11y-font-readable select {
+  font-family: 'Lexend', 'Atkinson Hyperlegible', system-ui, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+html.a11y-reduce-motion *,
+html.a11y-reduce-motion *::before,
+html.a11y-reduce-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
