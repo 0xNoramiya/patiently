@@ -17,3 +17,6 @@ build
 .coverage
 .claude/
 *.tsbuildinfo
+# Runtime-generated artifacts served from /api/static/* — recreated on demand
+apps/api/static/audio/
+apps/api/static/photos/
