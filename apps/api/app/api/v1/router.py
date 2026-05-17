@@ -4,6 +4,7 @@ from app.api.v1 import (
     admin,
     exports,
     intake,
+    interactions,
     notes,
     prescriptions,
     queue,
@@ -24,3 +25,4 @@ api_router.include_router(stats.router, tags=["stats"])
 api_router.include_router(vitals.router, tags=["vitals"])
 api_router.include_router(exports.router, tags=["exports"])
 api_router.include_router(prescriptions.router, tags=["prescriptions"])
+api_router.include_router(interactions.router, tags=["interactions"])

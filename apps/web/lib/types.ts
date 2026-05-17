@@ -209,6 +209,25 @@ export interface PrescriptionDraftOut {
   created_at: string | null;
 }
 
+export interface DrugInteraction {
+  drug_a: string;
+  drug_b: string;
+  severity: 'major' | 'moderate' | 'minor';
+  rationale: string;
+}
+
+export interface InteractionsReport {
+  ticket_id: string;
+  drug_count: number;
+  sources: {
+    drafts: string[];
+    home_meds: string[];
+    previous_rx: string[];
+  };
+  interactions: DrugInteraction[];
+  by_severity: { major?: number; moderate?: number; minor?: number };
+}
+
 export interface VitalSignsOut {
   id: string;
   ticket_id: string;

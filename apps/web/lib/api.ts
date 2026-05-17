@@ -165,6 +165,11 @@ export const api = {
         headers: { 'X-Admin-Password': password },
       }
     ),
+  getInteractions: (ticketId: string, password: string) =>
+    http<import('./types').InteractionsReport>(
+      `/api/admin/tickets/${ticketId}/interactions`,
+      { headers: { 'X-Admin-Password': password } }
+    ),
 };
 
 export function streamUrl(path: string): string {

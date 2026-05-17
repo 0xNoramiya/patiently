@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import type { PrescriptionDraftOut } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { InteractionsPanel } from './interactions-panel';
 
 export function PrescriptionsWidget({
   ticketId,
@@ -17,6 +18,7 @@ export function PrescriptionsWidget({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pendingId, setPendingId] = useState<string | null>(null);
+  const [interactionsRefresh, setInteractionsRefresh] = useState(0);
 
   const refresh = useCallback(async () => {
     try {
@@ -40,6 +42,7 @@ export function PrescriptionsWidget({
     try {
       const list = await api.draftPrescriptions(ticketId, adminPassword);
       setRows(list);
+      setInteractionsRefresh((n) => n + 1);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'drafting failed');
     } finally {
@@ -94,6 +97,14 @@ export function PrescriptionsWidget({
           {error}
         </div>
       )}
+
+      <div className="mb-3">
+        <InteractionsPanel
+          ticketId={ticketId}
+          adminPassword={adminPassword}
+          refreshSignal={interactionsRefresh}
+        />
+      </div>
 
       {busy && (
         <div className="text-sm text-ink-500 flex items-center gap-2 mb-2">
