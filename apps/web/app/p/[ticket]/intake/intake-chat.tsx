@@ -9,6 +9,10 @@ import { api } from '@/lib/api';
 import type { IntakeMessage, IntakeSession, TicketDetail } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { ExtractedChips } from './extracted-chips';
+import {
+  IntakeOnboarding,
+  shouldShowOnboarding,
+} from './intake-onboarding';
 import { PhotoAttach } from './photo-attach';
 import { QuickReplies } from './quick-replies';
 import { VoiceButton } from './voice-button';
@@ -26,6 +30,13 @@ export function IntakeChat({ ticket, poliLabel }: Props) {
   const [starting, setStarting] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
+  // Only true until the patient has dismissed the onboarding once on this
+  // device. We start as null to avoid an SSR mismatch and resolve in an
+  // effect after mount.
+  const [showOnboarding, setShowOnboarding] = useState<boolean | null>(null);
+  useEffect(() => {
+    setShowOnboarding(shouldShowOnboarding());
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -102,6 +113,16 @@ export function IntakeChat({ ticket, poliLabel }: Props) {
   );
   const completed = session?.status === 'completed';
   const triageFired = (session?.triage_flags || []).length > 0;
+
+  if (showOnboarding) {
+    const lang: 'en' | 'id' = session?.language === 'id' ? 'id' : 'en';
+    return (
+      <IntakeOnboarding
+        language={lang}
+        onDismiss={() => setShowOnboarding(false)}
+      />
+    );
+  }
 
   return (
     <main className="min-h-screen flex flex-col">
