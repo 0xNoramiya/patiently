@@ -20,7 +20,9 @@ from app.models.intake import IntakeSession
 from app.models.note import ConsultationNote, NoteStatus
 from app.models.queue_ticket import QueueTicket
 from app.models.transcript import ConsultationTranscript, TranscriptStatus
+from app.models.vital_signs import VitalSigns
 from app.services.events import bus
+from app.services.vitals import CRITICAL_LABELS
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +42,11 @@ async def draft_for_ticket(ticket_id: uuid.UUID) -> dict:
             else None
         )
         transcript_text = await _latest_transcript_text(db, ticket_id)
+        vitals_block = await _vitals_block(db, ticket_id)
+        if vitals_block:
+            patient_block = (
+                patient_block + "\nVitals on arrival:\n" + vitals_block
+            )
 
         record = ConsultationNote(
             ticket_id=ticket_id, status=NoteStatus.drafting
@@ -90,6 +97,36 @@ async def get_for_ticket(ticket_id: uuid.UUID) -> dict | None:
         )
         row = (await db.execute(stmt)).scalar_one_or_none()
         return _serialize(row) if row else None
+
+
+async def _vitals_block(
+    db: AsyncSession, ticket_id: uuid.UUID
+) -> str | None:
+    stmt = select(VitalSigns).where(VitalSigns.ticket_id == ticket_id)
+    v = (await db.execute(stmt)).scalar_one_or_none()
+    if v is None:
+        return None
+    rows: list[str] = []
+    if v.systolic_bp and v.diastolic_bp:
+        rows.append(f"  BP {v.systolic_bp}/{v.diastolic_bp} mmHg")
+    if v.heart_rate:
+        rows.append(f"  HR {v.heart_rate} bpm")
+    if v.respiratory_rate:
+        rows.append(f"  RR {v.respiratory_rate} /min")
+    if v.temperature_c is not None:
+        rows.append(f"  Temp {v.temperature_c:.1f} °C")
+    if v.spo2:
+        rows.append(f"  SpO₂ {v.spo2}%")
+    if v.pain_score is not None:
+        rows.append(f"  Pain {v.pain_score}/10")
+    if v.critical_findings:
+        rows.append(
+            "  Critical findings: "
+            + ", ".join(
+                CRITICAL_LABELS.get(f, f) for f in v.critical_findings
+            )
+        )
+    return "\n".join(rows) if rows else None
 
 
 async def _load_ticket(db: AsyncSession, ticket_id: uuid.UUID):

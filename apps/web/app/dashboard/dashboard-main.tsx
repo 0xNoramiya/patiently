@@ -18,6 +18,7 @@ import { NotesWidget } from './notes-widget';
 import { RemindersPanel } from './reminders-panel';
 import { StatsStrip } from './stats-strip';
 import { TranscriptWidget } from './transcript-widget';
+import { VitalsCard } from './vitals-card';
 
 const POLI_LIST: Poli[] = ['umum', 'anak', 'kia', 'gigi', 'lansia'];
 
@@ -630,6 +631,11 @@ function DetailPane({
               </ul>
             </Card>
           )}
+
+          <VitalsCard
+            ticketId={ticket.id}
+            adminPassword={adminPassword}
+          />
 
           <TranscriptWidget
             ticketId={ticket.id}

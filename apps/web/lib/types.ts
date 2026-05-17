@@ -195,6 +195,38 @@ export interface ConsultationTranscriptOut {
   completed_at: string | null;
 }
 
+export interface VitalSignsOut {
+  id: string;
+  ticket_id: string;
+  systolic_bp: number | null;
+  diastolic_bp: number | null;
+  heart_rate: number | null;
+  respiratory_rate: number | null;
+  temperature_c: number | null;
+  spo2: number | null;
+  weight_kg: number | null;
+  height_cm: number | null;
+  pain_score: number | null;
+  recorded_by: string | null;
+  critical_findings: string[];
+  critical_labels: string[];
+  recorded_at: string | null;
+  updated_at: string | null;
+}
+
+export interface VitalSignsIn {
+  systolic_bp?: number | null;
+  diastolic_bp?: number | null;
+  heart_rate?: number | null;
+  respiratory_rate?: number | null;
+  temperature_c?: number | null;
+  spo2?: number | null;
+  weight_kg?: number | null;
+  height_cm?: number | null;
+  pain_score?: number | null;
+  recorded_by?: string | null;
+}
+
 export interface ClinicStats {
   as_of: string;
   tickets: {

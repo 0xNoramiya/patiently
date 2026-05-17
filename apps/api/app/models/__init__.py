@@ -15,6 +15,7 @@ from app.models.intake import (
 from app.models.note import ConsultationNote, NoteStatus
 from app.models.reminder import AppointmentReminder, ReminderStatus
 from app.models.transcript import ConsultationTranscript, TranscriptStatus
+from app.models.vital_signs import VitalSigns
 
 __all__ = [
     "Patient",
@@ -35,4 +36,5 @@ __all__ = [
     "TranscriptStatus",
     "ConsultationNote",
     "NoteStatus",
+    "VitalSigns",
 ]

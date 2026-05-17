@@ -102,6 +102,25 @@ export const api = {
     http<import('./types').ClinicStats>(`/api/admin/stats`, {
       headers: { 'X-Admin-Password': password },
     }),
+
+  getVitals: (ticketId: string, password: string) =>
+    http<import('./types').VitalSignsOut | null>(
+      `/api/admin/tickets/${ticketId}/vitals`,
+      { headers: { 'X-Admin-Password': password } }
+    ),
+  recordVitals: (
+    ticketId: string,
+    vitals: import('./types').VitalSignsIn,
+    password: string
+  ) =>
+    http<import('./types').VitalSignsOut>(
+      `/api/admin/tickets/${ticketId}/vitals`,
+      {
+        method: 'POST',
+        body: JSON.stringify(vitals),
+        headers: { 'X-Admin-Password': password },
+      }
+    ),
 };
 
 export function streamUrl(path: string): string {
