@@ -4,6 +4,7 @@ from app.api.v1 import (
     admin,
     attachments,
     exports,
+    feedback,
     intake,
     interactions,
     notes,
@@ -30,3 +31,4 @@ api_router.include_router(prescriptions.router, tags=["prescriptions"])
 api_router.include_router(interactions.router, tags=["interactions"])
 api_router.include_router(voice.router, tags=["voice"])
 api_router.include_router(attachments.router, tags=["attachments"])
+api_router.include_router(feedback.router, tags=["feedback"])

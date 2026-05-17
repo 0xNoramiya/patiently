@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 import { Logo } from '@/components/Logo';
 import { api } from '@/lib/api';
@@ -102,6 +103,21 @@ export function TicketView({
       document.title = base;
     }
   }, [ticket.status, ticket.ticket_number]);
+
+  // Auto-redirect to /done when the visit is complete. Small delay so a
+  // patient who's mid-page can see "done" appear briefly before the
+  // transition, and we don't redirect on initial page load if they
+  // come back to /p/[id] later.
+  const router = useRouter();
+  const doneRedirectRef = useRef(false);
+  useEffect(() => {
+    if (ticket.status !== 'done' || doneRedirectRef.current) return;
+    doneRedirectRef.current = true;
+    const t = setTimeout(() => {
+      router.push(`/p/${ticket.id}/done`);
+    }, 600);
+    return () => clearTimeout(t);
+  }, [ticket.status, ticket.id, router]);
 
   const meEntry = useMemo(() => {
     if (!queue) return null;
