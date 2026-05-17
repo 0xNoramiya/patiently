@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import Link from 'next/link';
 
 import { Logo } from '@/components/Logo';
 import { api } from '@/lib/api';
@@ -223,9 +224,9 @@ export function DashboardMain({
               {POLI_LABEL[p]}
             </button>
           ))}
-          <button onClick={onLogout} className="btn-ghost text-xs ml-2">
-            Sign out
-          </button>
+          <Link href="/" className="btn-ghost text-xs ml-2">
+            ← Home
+          </Link>
         </div>
       </header>
 
