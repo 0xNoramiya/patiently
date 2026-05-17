@@ -90,18 +90,87 @@ export default async function Home() {
         </a>
       </header>
 
-      <section className="flex-1 grid place-items-center px-6 md:px-12 py-10">
-        <div className="max-w-3xl text-center w-full">
+      <section className="flex-1 px-6 md:px-12 py-10">
+        <div className="max-w-3xl mx-auto w-full text-center">
           <span className="pill-brand mb-6 inline-flex">Live demo</span>
           <h1 className="font-display text-4xl md:text-6xl font-bold leading-tight text-ink-900">
-            Pick a seat in the
+            Waiting rooms that
             <br />
-            <span className="text-brand-700">clinic floor.</span>
+            <span className="text-brand-700">work for you.</span>
           </h1>
           <p className="mt-6 text-lg text-ink-500 max-w-2xl mx-auto">
-            Two views into the same queue. The clinician sees the multi-agent
-            chart-prep dashboard. The patient holds a phone in the waiting
-            room and chats with Patiently. Try either side — no sign-in.
+            Patiently turns the clinic waiting room into productive time. A
+            patient scans the QR on their paper ticket and starts chatting
+            with the intake assistant. By the time the doctor calls them in,
+            the chart is already written.
+          </p>
+
+          <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
+            <div className="card-padded">
+              <div className="text-[10px] uppercase tracking-wider text-brand-700 font-bold">
+                During the wait
+              </div>
+              <h3 className="font-display font-semibold text-ink-900 mt-1.5">
+                Three agents do the chart prep
+              </h3>
+              <p className="text-sm text-ink-500 mt-2 leading-snug">
+                An <span className="font-semibold text-ink-700">Intake Agent</span>{' '}
+                gathers OPQRST in plain language. A separate{' '}
+                <span className="font-semibold text-ink-700">Triage Agent</span>{' '}
+                independently watches every turn for red flags. A{' '}
+                <span className="font-semibold text-ink-700">Summarizer</span>{' '}
+                writes the physician chart.
+              </p>
+            </div>
+
+            <div className="card-padded">
+              <div className="text-[10px] uppercase tracking-wider text-brand-700 font-bold">
+                When something's urgent
+              </div>
+              <h3 className="font-display font-semibold text-ink-900 mt-1.5">
+                Triage bumps the queue automatically
+              </h3>
+              <p className="text-sm text-ink-500 mt-2 leading-snug">
+                Eight red-flag codes (chest pain, stroke signs, anaphylaxis,
+                pediatric danger signs…) push the ticket to the top of the
+                queue in real time. The dashboard pops a toast; the patient
+                sees a calm reassurance card.
+              </p>
+            </div>
+
+            <div className="card-padded">
+              <div className="text-[10px] uppercase tracking-wider text-brand-700 font-bold">
+                After the visit
+              </div>
+              <h3 className="font-display font-semibold text-ink-900 mt-1.5">
+                SOAP, prescriptions, reminders
+              </h3>
+              <p className="text-sm text-ink-500 mt-2 leading-snug">
+                Featherless drafts a SOAP note and a structured prescription
+                list with drug-interaction checking. Speechmatics transcribes
+                the consultation. A scheduled workflow texts the patient when
+                their next appointment is due.
+              </p>
+            </div>
+          </div>
+
+          <p className="mt-8 text-xs text-ink-400">
+            Built on <span className="font-semibold">Gemini</span> ·{' '}
+            <span className="font-semibold">Featherless</span> ·{' '}
+            <span className="font-semibold">Speechmatics</span> ·{' '}
+            <span className="font-semibold">FastAPI</span> ·{' '}
+            <span className="font-semibold">Next.js 14</span> ·{' '}
+            <span className="font-semibold">PostgreSQL</span>
+          </p>
+
+          <hr className="my-10 border-ink-100" />
+
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-ink-900">
+            Try it from either side
+          </h2>
+          <p className="mt-2 text-sm text-ink-500 max-w-xl mx-auto">
+            Same live queue. The clinician opens the chart-prep dashboard;
+            the patient opens their phone view. No sign-in.
           </p>
 
           <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
@@ -215,21 +284,8 @@ export default async function Home() {
               </Link>
             </div>
           )}
-
-          <p className="mt-10 text-xs text-ink-400">
-            For the demo only · no auth gates · the reception console is at{' '}
-            <Link href="/receptionist" className="underline hover:text-brand-700">
-              /receptionist
-            </Link>
-            .
-          </p>
         </div>
       </section>
-
-      <footer className="px-6 md:px-12 py-6 text-xs text-ink-400 text-center">
-        Patiently · prototype · multi-agent pre-visit intake & queue ·
-        Gemini · Featherless · Speechmatics
-      </footer>
     </main>
   );
 }
