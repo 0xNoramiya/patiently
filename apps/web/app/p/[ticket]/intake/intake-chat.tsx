@@ -9,6 +9,7 @@ import { api } from '@/lib/api';
 import type { IntakeMessage, IntakeSession, TicketDetail } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { ExtractedChips } from './extracted-chips';
+import { VoiceButton } from './voice-button';
 
 interface Props {
   ticket: TicketDetail;
@@ -166,34 +167,47 @@ export function IntakeChat({ ticket, poliLabel }: Props) {
           )}
           <div className="px-4 py-3 border-t border-ink-100 bg-white">
             <div className="flex items-end gap-2">
+              <VoiceButton
+                ticketId={ticket.id}
+                disabled={sending || starting}
+                onTranscript={(text) => {
+                  setInput((current) =>
+                    current.trim().length === 0
+                      ? text
+                      : `${current.trim()} ${text}`.trim()
+                  );
+                  setError(null);
+                }}
+                onError={(msg) => setError(msg)}
+              />
               <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSend();
-                }
-              }}
-              placeholder="Type your reply..."
-              rows={1}
-              disabled={sending || starting}
-              className="flex-1 resize-none rounded-2xl border border-ink-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none px-4 py-3 text-base"
-            />
-            <button
-              onClick={handleSend}
-              disabled={!input.trim() || sending || starting}
-              className="btn-primary px-5 py-3 shrink-0"
-              aria-label="Send"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M3.4 20.4 22 12 3.4 3.6l.7 6.4L17 12l-12.9 2 -.7 6.4z"
-                  fill="currentColor"
-                />
-              </svg>
-            </button>
-          </div>
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
+                  }
+                }}
+                placeholder="Type or tap the mic to speak..."
+                rows={1}
+                disabled={sending || starting}
+                className="flex-1 resize-none rounded-2xl border border-ink-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none px-4 py-3 text-base"
+              />
+              <button
+                onClick={handleSend}
+                disabled={!input.trim() || sending || starting}
+                className="btn-primary px-5 py-3 shrink-0"
+                aria-label="Send"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M3.4 20.4 22 12 3.4 3.6l.7 6.4L17 12l-12.9 2 -.7 6.4z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+            </div>
             <div className="flex items-center justify-between mt-2">
               <span className="text-[11px] text-ink-400">
                 Enter to send · Shift+Enter for a new line

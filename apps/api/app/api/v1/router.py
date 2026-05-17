@@ -12,6 +12,7 @@ from app.api.v1 import (
     stats,
     transcripts,
     vitals,
+    voice,
 )
 
 api_router = APIRouter(prefix="/api")
@@ -26,3 +27,4 @@ api_router.include_router(vitals.router, tags=["vitals"])
 api_router.include_router(exports.router, tags=["exports"])
 api_router.include_router(prescriptions.router, tags=["prescriptions"])
 api_router.include_router(interactions.router, tags=["interactions"])
+api_router.include_router(voice.router, tags=["voice"])
