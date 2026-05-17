@@ -3,7 +3,7 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
-from sqlalchemy import DateTime, Enum, ForeignKey, Text, func
+from sqlalchemy import DateTime, Enum, ForeignKey, String, Text, func
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -49,6 +49,9 @@ class IntakeSession(Base):
         JSONB, nullable=False, default=list
     )
     summary: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
+    language: Mapped[str] = mapped_column(
+        String(8), nullable=False, default="en", server_default="en"
+    )
     started_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )

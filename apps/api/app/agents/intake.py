@@ -34,7 +34,44 @@ from app.services import queue as queue_service
 
 _PROMPT_PATH = os.path.join(os.path.dirname(__file__), "prompts", "intake_system.txt")
 with open(_PROMPT_PATH, "r", encoding="utf-8") as f:
-    INTAKE_SYSTEM_PROMPT = f.read()
+    INTAKE_SYSTEM_PROMPT_EN = f.read()
+
+_PROMPT_PATH_ID = os.path.join(
+    os.path.dirname(__file__), "prompts", "intake_system_id.txt"
+)
+try:
+    with open(_PROMPT_PATH_ID, "r", encoding="utf-8") as f:
+        INTAKE_SYSTEM_PROMPT_ID = f.read()
+except FileNotFoundError:
+    INTAKE_SYSTEM_PROMPT_ID = INTAKE_SYSTEM_PROMPT_EN
+
+# Backwards-compatible alias — older code paths still reference this name.
+INTAKE_SYSTEM_PROMPT = INTAKE_SYSTEM_PROMPT_EN
+
+
+def _prompt_for(language: str | None) -> str:
+    lang = (language or "en").lower()
+    if lang.startswith("id"):
+        return INTAKE_SYSTEM_PROMPT_ID
+    return INTAKE_SYSTEM_PROMPT_EN
+
+
+def _greeting_seed(language: str | None) -> str:
+    """The instruction we hand to the intake LLM to open the conversation."""
+    lang = (language or "en").lower()
+    if lang.startswith("id"):
+        return (
+            "Mulai percakapan intake. Sapa pasien dengan hangat dalam Bahasa "
+            "Indonesia. Jika is_followup=true, sebutkan kunjungan sebelumnya "
+            "dan tanyakan kabar gejalanya sekarang. Jika is_followup=false, "
+            "tanyakan keluhan hari ini."
+        )
+    return (
+        "Open the intake conversation. Greet the patient warmly using "
+        "their name. If is_followup=true, acknowledge the previous visit "
+        "and ask about their symptoms now. Otherwise, ask what brings "
+        "them in today."
+    )
 
 
 @dataclass
@@ -115,23 +152,41 @@ def _render_plain_history(messages: list[IntakeMessage]) -> str:
 
 
 async def start_session(
-    db: AsyncSession, ticket: QueueTicket
+    db: AsyncSession,
+    ticket: QueueTicket,
+    *,
+    language: str = "en",
 ) -> tuple[IntakeSession, IntakeMessage]:
-    """Create the session and emit the agent's greeting."""
+    """Create the session and emit the agent's greeting.
+
+    `language` is the ISO code of the language the conversation will run in.
+    Currently supported: "en" (default) and "id" (Bahasa Indonesia). It's
+    stored on the session and used for every subsequent agent turn.
+    """
     existing = await db.execute(
         select(IntakeSession).where(IntakeSession.ticket_id == ticket.id)
     )
     session = existing.scalar_one_or_none()
+    normalized_lang = (language or "en").lower()
+    if not normalized_lang.startswith("id"):
+        normalized_lang = "en"
     if session is None:
         session = IntakeSession(
             ticket_id=ticket.id,
             status=IntakeStatus.active,
             structured_data={},
             triage_flags=[],
+            language=normalized_lang,
         )
         db.add(session)
         await db.commit()
         await db.refresh(session)
+    else:
+        # Existing session — if the patient picked a different language on
+        # restart, honour it ONLY when no messages have been exchanged yet.
+        if session.language != normalized_lang and not session.messages:
+            session.language = normalized_lang
+            await db.commit()
 
     emr_context = await _build_emr_context(db, ticket)
     db.add(
@@ -142,6 +197,7 @@ async def start_session(
         )
     )
 
+    system_prompt = _prompt_for(session.language)
     contents = [
         {
             "role": "user",
@@ -150,22 +206,24 @@ async def start_session(
                     "text": (
                         f"{emr_context}\n\n"
                         "=== TASK ===\n"
-                        "Open the intake conversation. Greet the patient warmly using "
-                        "their name. If is_followup=true, acknowledge the previous visit "
-                        "and ask about their symptoms now. Otherwise, ask what brings "
-                        "them in today."
+                        f"{_greeting_seed(session.language)}"
                     )
                 }
             ],
         }
     ]
     result = await generate_json(
-        system_instruction=INTAKE_SYSTEM_PROMPT,
+        system_instruction=system_prompt,
         contents=contents,
         response_schema=INTAKE_RESPONSE_SCHEMA,
         temperature=0.5,
     )
-    reply = (result.get("reply_text") or "Hello — I'm Patiently. What brings you in today?").strip()
+    default_reply = (
+        "Halo — saya Patiently. Apa keluhan Anda hari ini?"
+        if session.language.startswith("id")
+        else "Hello — I'm Patiently. What brings you in today?"
+    )
+    reply = (result.get("reply_text") or default_reply).strip()
     msg = IntakeMessage(
         session_id=session.id,
         role=MessageRole.agent,
@@ -226,7 +284,7 @@ async def respond(
 
     # === RUN AGENTS IN PARALLEL ===
     intake_task = generate_json(
-        system_instruction=INTAKE_SYSTEM_PROMPT,
+        system_instruction=_prompt_for(session.language),
         contents=intake_contents,
         response_schema=INTAKE_RESPONSE_SCHEMA,
         temperature=0.5,
@@ -239,7 +297,12 @@ async def respond(
     )
     intake_result, triage_verdict = await asyncio.gather(intake_task, triage_task)
 
-    reply_text = (intake_result.get("reply_text") or "").strip() or "Sorry, could you say that again?"
+    fallback_reply = (
+        "Maaf, bisa diulang ya."
+        if (session.language or "en").startswith("id")
+        else "Sorry, could you say that again?"
+    )
+    reply_text = (intake_result.get("reply_text") or "").strip() or fallback_reply
     extracted = intake_result.get("extracted_fields") or {}
     is_complete = bool(intake_result.get("is_complete"))
     flags_this_turn = list(triage_verdict.flags)

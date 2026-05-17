@@ -140,6 +140,7 @@ export interface IntakeSession {
   structured_data: Record<string, unknown>;
   triage_flags: string[];
   summary: IntakeSummary | null;
+  language?: 'en' | 'id';
   started_at: string;
   completed_at: string | null;
   messages: IntakeMessage[];

@@ -22,6 +22,7 @@ class IntakeSessionOut(BaseModel):
     structured_data: dict[str, Any] = {}
     triage_flags: list[str] = []
     summary: dict[str, Any] | None = None
+    language: str = "en"
     started_at: datetime
     completed_at: datetime | None
     messages: list[IntakeMessageOut] = []

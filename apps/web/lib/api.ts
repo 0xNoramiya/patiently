@@ -36,8 +36,11 @@ export const api = {
   getTicket: (id: string) => http<TicketDetail>(`/api/tickets/${id}`),
   cancelTicket: (id: string) =>
     http<TicketDetail>(`/api/tickets/${id}/cancel`, { method: 'POST' }),
-  startIntake: (id: string) =>
-    http<IntakeSession>(`/api/intake/${id}/start`, { method: 'POST' }),
+  startIntake: (id: string, language: 'en' | 'id' = 'en') =>
+    http<IntakeSession>(
+      `/api/intake/${id}/start?language=${language}`,
+      { method: 'POST' }
+    ),
   getSession: (id: string) => http<IntakeSession>(`/api/intake/${id}/session`),
   sendMessage: (id: string, content: string) =>
     http<AgentResponse>(`/api/intake/${id}/message`, {

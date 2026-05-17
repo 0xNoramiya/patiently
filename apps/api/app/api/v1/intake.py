@@ -49,7 +49,9 @@ async def _ticket_with_session(
 
 @router.post("/intake/{ticket_id}/start", response_model=IntakeSessionOut)
 async def start_intake(
-    ticket_id: uuid.UUID, db: AsyncSession = Depends(get_db)
+    ticket_id: uuid.UUID,
+    language: str = "en",
+    db: AsyncSession = Depends(get_db),
 ) -> IntakeSessionOut:
     ticket = await _ticket_with_session(db, ticket_id)
     if ticket is None:
@@ -64,7 +66,7 @@ async def start_intake(
         )
         return IntakeSessionOut.model_validate(session)
 
-    session, _ = await intake_agent.start_session(db, ticket)
+    session, _ = await intake_agent.start_session(db, ticket, language=language)
     fresh = await _load_session_with_messages(db, session.id)
     await bus.publish(
         f"ticket:{ticket.id}",

@@ -285,9 +285,7 @@ export function TicketView({
 
         <div className="mt-6">
           {ticket.status === 'waiting' && !ticket.intake_complete && (
-            <Link href={`/p/${ticket.id}/intake`} className="btn-primary w-full text-base">
-              Start pre-visit intake
-            </Link>
+            <LanguagePickerAndStart ticketId={ticket.id} />
           )}
           {ticket.status === 'in_intake' && (
             <Link href={`/p/${ticket.id}/intake`} className="btn-primary w-full text-base">
@@ -327,5 +325,83 @@ export function TicketView({
         </p>
       </section>
     </main>
+  );
+}
+
+const LANG_LABELS: Record<'en' | 'id', string> = {
+  en: 'English',
+  id: 'Bahasa Indonesia',
+};
+
+const LANG_HINT: Record<'en' | 'id', string> = {
+  en: 'The intake assistant will speak with you in English.',
+  id: 'Asisten intake akan bicara dengan Anda dalam Bahasa Indonesia.',
+};
+
+const LANG_CTA: Record<'en' | 'id', string> = {
+  en: 'Start pre-visit intake',
+  id: 'Mulai persiapan kunjungan',
+};
+
+function LanguagePickerAndStart({ ticketId }: { ticketId: string }) {
+  const [lang, setLang] = useState<'en' | 'id'>('en');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+
+  async function go() {
+    setBusy(true);
+    setError(null);
+    try {
+      await api.startIntake(ticketId, lang);
+      router.push(`/p/${ticketId}/intake`);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not start the session');
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="rounded-2xl border border-ink-100 bg-white p-3">
+        <div className="text-[10px] uppercase tracking-wider text-ink-500 font-bold mb-2">
+          Choose your language · Pilih bahasa
+        </div>
+        <div className="grid grid-cols-2 gap-2" role="radiogroup">
+          {(['en', 'id'] as const).map((opt) => (
+            <button
+              key={opt}
+              role="radio"
+              aria-checked={lang === opt}
+              onClick={() => setLang(opt)}
+              className={cn(
+                'rounded-xl border px-3 py-2 text-sm font-semibold transition-colors',
+                lang === opt
+                  ? 'border-brand-600 bg-brand-50 text-brand-700 ring-2 ring-brand-200'
+                  : 'border-ink-200 bg-white text-ink-700 hover:bg-ink-50'
+              )}
+            >
+              <span className="block text-[10px] uppercase tracking-wider text-ink-400 mb-0.5">
+                {opt === 'en' ? 'EN' : 'ID'}
+              </span>
+              {LANG_LABELS[opt]}
+            </button>
+          ))}
+        </div>
+        <p className="text-[11px] text-ink-500 mt-2">{LANG_HINT[lang]}</p>
+      </div>
+      <button
+        onClick={go}
+        disabled={busy}
+        className="btn-primary w-full text-base"
+      >
+        {busy ? '…' : LANG_CTA[lang]}
+      </button>
+      {error && (
+        <div className="text-xs text-alert-700 bg-alert-50 border border-alert-100 rounded-xl px-3 py-2">
+          {error}
+        </div>
+      )}
+    </div>
   );
 }
