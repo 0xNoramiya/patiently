@@ -16,6 +16,7 @@ import {
 import { cn, formatRelative } from '@/lib/utils';
 import { NotesWidget } from './notes-widget';
 import { RemindersPanel } from './reminders-panel';
+import { StatsStrip } from './stats-strip';
 import { TranscriptWidget } from './transcript-widget';
 
 const POLI_LIST: Poli[] = ['umum', 'anak', 'kia', 'gigi', 'lansia'];
@@ -226,7 +227,9 @@ export function DashboardMain({
         </div>
       </header>
 
-      <div className="grid grid-cols-12 gap-4 px-4 py-4 h-[calc(100vh-64px)]">
+      <StatsStrip adminPassword={adminPassword} />
+
+      <div className="grid grid-cols-12 gap-4 px-4 pb-4 h-[calc(100vh-64px-92px)]">
         <aside className="col-span-5 xl:col-span-4 card overflow-hidden flex flex-col">
           <div className="px-5 py-4 border-b border-ink-100 flex items-center justify-between">
             <div>

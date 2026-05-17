@@ -195,6 +195,27 @@ export interface ConsultationTranscriptOut {
   completed_at: string | null;
 }
 
+export interface ClinicStats {
+  as_of: string;
+  tickets: {
+    waiting: number;
+    in_consultation: number;
+    seen_today: number;
+    by_status: Record<string, number>;
+    by_poli_active: Record<string, number>;
+  };
+  intakes_completed_today: number;
+  triage: {
+    total_today: number;
+    by_flag: Record<string, number>;
+  };
+  avg_consult_minutes: number | null;
+  avg_wait_minutes: number | null;
+  reminders: { sent_today: number; pending: number };
+  transcripts_today: number;
+  notes_today: number;
+}
+
 export const RED_FLAG_LABELS: Record<string, string> = {
   CHEST_PAIN_CARDIAC: 'Possible acute coronary syndrome',
   STROKE_SYMPTOMS: 'Acute stroke symptoms',

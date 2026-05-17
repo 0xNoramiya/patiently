@@ -97,6 +97,11 @@ export const api = {
       `/api/admin/tickets/${ticketId}/notes`,
       { headers: { 'X-Admin-Password': password } }
     ),
+
+  getStats: (password: string) =>
+    http<import('./types').ClinicStats>(`/api/admin/stats`, {
+      headers: { 'X-Admin-Password': password },
+    }),
 };
 
 export function streamUrl(path: string): string {
