@@ -41,16 +41,30 @@ export function TicketView({
 
   useEffect(() => {
     let mounted = true;
-    api.getQueue(ticket.poli).then((q) => mounted && setQueue(q));
-    const es = new EventSource(`/api/queue/${ticket.poli}/stream`);
-    es.onmessage = () => {
+
+    const refresh = () => {
       api.getTicket(ticket.id).then((t) => mounted && setTicket(t)).catch(() => {});
       api.getQueue(ticket.poli).then((q) => mounted && setQueue(q)).catch(() => {});
     };
-    es.onerror = () => es.close();
+
+    // Initial snapshot.
+    api.getQueue(ticket.poli).then((q) => mounted && setQueue(q)).catch(() => {});
+
+    // Primary signal: SSE. We deliberately do NOT close the EventSource
+    // on error — browsers retry automatically and closing here would
+    // permanently break the live link after any blip (uvicorn restart,
+    // proxy hiccup, network drop in the waiting room).
+    const es = new EventSource(`/api/queue/${ticket.poli}/stream`);
+    es.onmessage = refresh;
+
+    // Safety net: poll every 5s in case the SSE channel is stuck
+    // (Next dev rewrites can buffer; service workers can intercept).
+    const pollId = setInterval(refresh, 5000);
+
     return () => {
       mounted = false;
       es.close();
+      clearInterval(pollId);
     };
   }, [ticket.poli, ticket.id]);
 
