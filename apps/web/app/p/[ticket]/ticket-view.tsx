@@ -20,6 +20,7 @@ import {
   useChime,
   useFlashOnDecrease,
 } from './queue-animation';
+import { ShareTicketButton } from './share-ticket-button';
 import { TriageReassurance } from './triage-reassurance';
 import { YourStoryCard } from './your-story-card';
 
@@ -158,9 +159,17 @@ export function TicketView({
 
   return (
     <main className="min-h-screen pb-24">
-      <header className="px-5 pt-6 pb-4 flex items-center justify-between">
+      <header className="px-5 pt-6 pb-4 flex items-center justify-between gap-3">
         <Logo />
-        <span className="pill-ink text-[11px] uppercase tracking-wide">{poliLabel}</span>
+        <div className="flex items-center gap-2">
+          <ShareTicketButton
+            ticketNumber={ticket.ticket_number}
+            patientName={ticket.patient.name}
+          />
+          <span className="pill-ink text-[11px] uppercase tracking-wide">
+            {poliLabel}
+          </span>
+        </div>
       </header>
 
       <section className="px-5">
