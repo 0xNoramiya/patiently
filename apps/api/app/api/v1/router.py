@@ -2,6 +2,7 @@ from fastapi import APIRouter
 
 from app.api.v1 import (
     admin,
+    attachments,
     exports,
     intake,
     interactions,
@@ -28,3 +29,4 @@ api_router.include_router(exports.router, tags=["exports"])
 api_router.include_router(prescriptions.router, tags=["prescriptions"])
 api_router.include_router(interactions.router, tags=["interactions"])
 api_router.include_router(voice.router, tags=["voice"])
+api_router.include_router(attachments.router, tags=["attachments"])

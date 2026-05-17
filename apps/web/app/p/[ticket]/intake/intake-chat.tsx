@@ -9,6 +9,7 @@ import { api } from '@/lib/api';
 import type { IntakeMessage, IntakeSession, TicketDetail } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { ExtractedChips } from './extracted-chips';
+import { PhotoAttach } from './photo-attach';
 import { VoiceButton } from './voice-button';
 
 interface Props {
@@ -165,8 +166,13 @@ export function IntakeChat({ ticket, poliLabel }: Props) {
               isFollowup={ticket.is_followup}
             />
           )}
-          <div className="px-4 py-3 border-t border-ink-100 bg-white">
+          <div className="relative px-4 py-3 border-t border-ink-100 bg-white">
             <div className="flex items-end gap-2">
+              <PhotoAttach
+                ticketId={ticket.id}
+                disabled={sending || starting}
+                onError={(msg) => setError(msg)}
+              />
               <VoiceButton
                 ticketId={ticket.id}
                 disabled={sending || starting}

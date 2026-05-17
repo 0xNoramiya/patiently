@@ -12,6 +12,7 @@ from app.models.intake import (
     IntakeStatus,
     MessageRole,
 )
+from app.models.attachment import PatientAttachment
 from app.models.note import ConsultationNote, NoteStatus
 from app.models.prescription_draft import PrescriptionDraft
 from app.models.reminder import AppointmentReminder, ReminderStatus
@@ -39,4 +40,5 @@ __all__ = [
     "NoteStatus",
     "VitalSigns",
     "PrescriptionDraft",
+    "PatientAttachment",
 ]
