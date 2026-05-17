@@ -12,6 +12,7 @@ import {
   type TicketDetail,
 } from '@/lib/types';
 import { cn, formatEta } from '@/lib/utils';
+import { InstallPrompt } from '@/components/InstallPrompt';
 import { JourneyStrip } from './journey-strip';
 import { YourStoryCard } from './your-story-card';
 
@@ -126,6 +127,9 @@ export function TicketView({
             intakeComplete={ticket.intake_complete}
           />
         </div>
+
+        <InstallPrompt className="mb-4" />
+
         {ticket.is_followup && (
           <div className="card-padded mb-4 bg-brand-50 border-brand-200">
             <div className="flex items-start gap-3">
