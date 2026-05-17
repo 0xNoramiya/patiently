@@ -3,9 +3,12 @@
 > Waiting rooms that work for you.
 > A multi-agent pre-visit intake and queue system for outpatient clinics.
 
-[![AI Agent Olympics 2026](https://img.shields.io/badge/AI%20Agent%20Olympics-2026-10b981)](https://featherless.ai)
+[![Live demo](https://img.shields.io/badge/Live%20demo-patiently.kudaliar.id-e11d48)](https://patiently.kudaliar.id)
+[![AI Agent Olympics 2026](https://img.shields.io/badge/AI%20Agent%20Olympics-2026-10b981)](https://lablab.ai/ai-hackathons/milan-ai-week-hackathon/muhammad-rifqi-haikal)
 [![Stack](https://img.shields.io/badge/Stack-Next.js%2014%20%C2%B7%20FastAPI%20%C2%B7%20PostgreSQL%2016-0e8265)](#stack)
 [![License](https://img.shields.io/badge/License-MIT-cbd5e1)](#license)
+
+**Live deployment:** https://patiently.kudaliar.id · **Submission:** https://lablab.ai/ai-hackathons/milan-ai-week-hackathon/muhammad-rifqi-haikal
 
 Patiently turns the clinic queue into productive time. A patient scans the QR code on their paper ticket and:
 
@@ -196,6 +199,12 @@ Then open:
 - http://localhost:3000/dashboard — password `clinic2026`
 - http://localhost:8000/docs — FastAPI auto-docs
 
+Or hit the **live deployment** instead:
+- https://patiently.kudaliar.id — landing
+- https://patiently.kudaliar.id/receptionist?token=demo-receptionist-token
+- https://patiently.kudaliar.id/dashboard — password `clinic2026`
+- https://patiently.kudaliar.id/health — API health
+
 For pure-host dev (no Docker):
 ```bash
 # API
@@ -326,7 +335,7 @@ MIT.
 
 ## Credits
 
-Built for the [AI Agent Olympics 2026](https://featherless.ai) hackathon (Milan AI Week).
+Built for the [AI Agent Olympics 2026](https://lablab.ai/ai-hackathons/milan-ai-week-hackathon/muhammad-rifqi-haikal) hackathon (Milan AI Week). Live demo: **[patiently.kudaliar.id](https://patiently.kudaliar.id)**.
 
 - Clinical reasoning by [Google Gemini](https://ai.google.dev)
 - Reminder generation by [Featherless](https://featherless.ai)
