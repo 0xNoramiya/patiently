@@ -14,6 +14,11 @@ import {
 import { cn, formatEta } from '@/lib/utils';
 import { InstallPrompt } from '@/components/InstallPrompt';
 import { JourneyStrip } from './journey-strip';
+import {
+  TweenedNumber,
+  useChime,
+  useFlashOnDecrease,
+} from './queue-animation';
 import { TriageReassurance } from './triage-reassurance';
 import { YourStoryCard } from './your-story-card';
 
@@ -113,6 +118,27 @@ export function TicketView({
   const ahead = meEntry ? Math.max(meEntry.position - 1, 0) : 0;
   const eta = meEntry ? formatEta(meEntry.eta_minutes_low, meEntry.eta_minutes_high) : '—';
   const isUrgent = ticket.priority >= 100 || ticket.triage_flags.length > 0;
+  const aheadFlash = useFlashOnDecrease(ahead);
+  const isNextUp =
+    ahead === 0 &&
+    (ticket.status === 'waiting' ||
+      ticket.status === 'in_intake' ||
+      ticket.status === 'intake_complete');
+  const playChime = useChime();
+  const chimedRef = useRef(false);
+  useEffect(() => {
+    if (ticket.status === 'in_consultation' && !chimedRef.current) {
+      chimedRef.current = true;
+      try {
+        playChime();
+      } catch {
+        /* ignore */
+      }
+    }
+    if (ticket.status !== 'in_consultation' && ticket.status !== 'done') {
+      chimedRef.current = false;
+    }
+  }, [ticket.status, playChime]);
 
   return (
     <main className="min-h-screen pb-24">
@@ -171,7 +197,12 @@ export function TicketView({
           </div>
         )}
 
-        <div className="card overflow-hidden">
+        <div
+          className={cn(
+            'card overflow-hidden transition-shadow',
+            isNextUp && 'next-up-glow'
+          )}
+        >
           <div className="p-6 bg-gradient-to-br from-brand-700 to-brand-600 text-white">
             <div className="text-sm opacity-80">Your queue number</div>
             <div className="font-display text-7xl font-bold tracking-tight mt-1">
@@ -180,15 +211,34 @@ export function TicketView({
             <div className="mt-3 text-sm opacity-90">
               {ticket.patient.name} · {ticket.patient.age} y/o
             </div>
+            {isNextUp && (
+              <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-white/15 backdrop-blur px-3 py-1 text-xs font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-200 vital-pulse" />
+                You're up next — keep your phone close
+              </div>
+            )}
           </div>
           <div className="grid grid-cols-3 divide-x divide-ink-100 text-center">
             <div className="p-4">
               <div className="text-[11px] uppercase tracking-wide text-ink-400">Now serving</div>
-              <div className="font-display text-2xl font-bold text-ink-900 mt-1">{nowServing}</div>
+              <div className="font-display text-2xl font-bold text-ink-900 mt-1">
+                {nowServing}
+              </div>
             </div>
             <div className="p-4">
-              <div className="text-[11px] uppercase tracking-wide text-ink-400">Ahead of you</div>
-              <div className="font-display text-2xl font-bold text-ink-900 mt-1">{ahead}</div>
+              <div className="text-[11px] uppercase tracking-wide text-ink-400">
+                {isNextUp ? 'Almost your turn' : 'Ahead of you'}
+              </div>
+              <div
+                key={aheadFlash ? `flash-${ahead}` : `still-${ahead}`}
+                className={cn(
+                  'font-display text-2xl font-bold mt-1 inline-block',
+                  isNextUp ? 'text-brand-700' : 'text-ink-900',
+                  aheadFlash && 'number-bounce'
+                )}
+              >
+                <TweenedNumber value={ahead} />
+              </div>
             </div>
             <div className="p-4">
               <div className="text-[11px] uppercase tracking-wide text-ink-400">Est. wait</div>

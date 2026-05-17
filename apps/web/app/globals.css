@@ -125,3 +125,17 @@ html, body {
   from { width: 0%; }
 }
 .progress-fill { animation: progress-fill 700ms cubic-bezier(0.4, 0, 0.2, 1) both; }
+
+@keyframes number-bounce {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(0.92); }
+  70%  { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+.number-bounce { animation: number-bounce 480ms cubic-bezier(0.4, 0, 0.2, 1); }
+
+@keyframes next-up-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.55), inset 0 0 0 2px rgba(255,255,255,0.04); }
+  50%      { box-shadow: 0 0 0 12px rgba(16,185,129,0), inset 0 0 0 2px rgba(255,255,255,0.04); }
+}
+.next-up-glow { animation: next-up-glow 1.8s ease-out infinite; }
