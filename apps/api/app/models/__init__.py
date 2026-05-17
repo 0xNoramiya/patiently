@@ -12,6 +12,7 @@ from app.models.intake import (
     IntakeStatus,
     MessageRole,
 )
+from app.models.note import ConsultationNote, NoteStatus
 from app.models.reminder import AppointmentReminder, ReminderStatus
 from app.models.transcript import ConsultationTranscript, TranscriptStatus
 
@@ -32,4 +33,6 @@ __all__ = [
     "ReminderStatus",
     "ConsultationTranscript",
     "TranscriptStatus",
+    "ConsultationNote",
+    "NoteStatus",
 ]

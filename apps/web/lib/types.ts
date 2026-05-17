@@ -169,6 +169,20 @@ export interface AppointmentReminder {
   created_at: string;
 }
 
+export interface ConsultationNoteOut {
+  id: string;
+  ticket_id: string;
+  status: 'pending' | 'drafting' | 'done' | 'failed';
+  subjective: string | null;
+  objective: string | null;
+  assessment: string | null;
+  plan: string | null;
+  model_used: string | null;
+  error: string | null;
+  created_at: string | null;
+  completed_at: string | null;
+}
+
 export interface ConsultationTranscriptOut {
   id: string;
   ticket_id: string;

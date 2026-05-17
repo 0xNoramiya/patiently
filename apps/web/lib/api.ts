@@ -86,6 +86,17 @@ export const api = {
       `/api/admin/tickets/${ticketId}/transcript`,
       { headers: { 'X-Admin-Password': password } }
     ),
+
+  draftNote: (ticketId: string, password: string) =>
+    http<import('./types').ConsultationNoteOut>(
+      `/api/admin/tickets/${ticketId}/notes`,
+      { method: 'POST', headers: { 'X-Admin-Password': password } }
+    ),
+  getNote: (ticketId: string, password: string) =>
+    http<import('./types').ConsultationNoteOut | null>(
+      `/api/admin/tickets/${ticketId}/notes`,
+      { headers: { 'X-Admin-Password': password } }
+    ),
 };
 
 export function streamUrl(path: string): string {
