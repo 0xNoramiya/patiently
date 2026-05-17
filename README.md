@@ -218,18 +218,6 @@ NEXT_PUBLIC_API_URL=http://localhost:8000 npm run dev
 
 ---
 
-## Demo script (5 minutes)
-
-1. Open `/receptionist`, issue a ticket for **Sarah Walters** to General Clinic. Badge shows "↩ Follow-up" because she visited last week for cough.
-2. Click "Open patient screen" — show the patient view with follow-up badge and live queue position.
-3. Tap "Start pre-visit intake". The Intake Agent greets her by name, references the ambroxol prescription, and asks how she's feeling now.
-4. Open `/dashboard` in another window. The ticket moves from "In intake" → "Ready for doctor" live via SSE. The Pre-visit Summary card has HPI in narrative form; the Follow-up Context card shows what was prescribed and the patient-reported delta.
-5. **Hero moment**: issue a ticket for **Bruce Hartman** to General Clinic. Start intake, describe "heavy pressure in the middle of my chest, started an hour ago, spreading to my left arm, sweating cold." The Triage Agent fires `CHEST_PAIN_CARDIAC`. Bruce's row jumps to the top of the dashboard with a red border; a triage toast pops; priority is now 100. The Intake Agent keeps talking calmly.
-6. Click "▶ Play & transcribe" on Bruce's ticket detail. The pipeline synthesizes the doctor's first-contact dialogue and Speechmatics returns a speaker-diarized transcript in ~10 seconds.
-7. Open the Reminders panel in the dashboard right rail. Press "Run due now". Featherless drafts personalized SMS messages for Henry (HT follow-up, mentions amlodipine) and Ryan (pediatric otitis follow-up, mentions amoxicillin). The scheduler fires the same code path every 60 seconds.
-
----
-
 ## API reference (selected)
 
 | Method | Path                                              | Auth                  | Description                                         |
