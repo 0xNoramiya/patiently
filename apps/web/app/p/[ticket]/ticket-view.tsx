@@ -38,6 +38,15 @@ export function TicketView({
   const [ticket, setTicket] = useState<TicketDetail>(initial);
   const [queue, setQueue] = useState<QueueState | null>(null);
   const lastStatusRef = useRef<TicketDetail['status']>(initial.status);
+  // Track Notification permission AFTER mount only, so SSR and the first
+  // client render produce identical HTML (otherwise React throws a
+  // hydration mismatch on the "✓ You'll get a notification…" span).
+  const [notifGranted, setNotifGranted] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!('Notification' in window)) return;
+    setNotifGranted(Notification.permission === 'granted');
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -338,13 +347,11 @@ export function TicketView({
 
         <p className="text-xs text-ink-400 text-center mt-8">
           This page updates automatically. Keep it open.
-          {typeof window !== 'undefined' &&
-            'Notification' in window &&
-            Notification.permission === 'granted' && (
-              <span className="block mt-1 text-brand-700">
-                ✓ You'll get a notification when it's your turn.
-              </span>
-            )}
+          {notifGranted && (
+            <span className="block mt-1 text-brand-700">
+              ✓ You'll get a notification when it's your turn.
+            </span>
+          )}
         </p>
       </section>
     </main>
