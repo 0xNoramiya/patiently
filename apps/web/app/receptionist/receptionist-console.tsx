@@ -14,12 +14,14 @@ import {
 } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
-const TOKEN_KEY = 'patiently:reception-token';
+// Demo build — no sign-in. The reception endpoints still require the
+// X-Receptionist-Token header, so we hard-code the seed's value.
+const DEMO_TOKEN =
+  process.env.NEXT_PUBLIC_RECEPTIONIST_TOKEN || 'demo-receptionist-token';
 const POLI_LIST: Poli[] = ['umum', 'anak', 'kia', 'gigi', 'lansia'];
 
 export function ReceptionistConsole() {
-  const [token, setToken] = useState<string | null>(null);
-  const [tokenDraft, setTokenDraft] = useState('');
+  const [token] = useState<string>(DEMO_TOKEN);
   const [patients, setPatients] = useState<Patient[] | null>(null);
   const [search, setSearch] = useState('');
   const [issuing, setIssuing] = useState<Patient | null>(null);
@@ -27,12 +29,6 @@ export function ReceptionistConsole() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const cached = sessionStorage.getItem(TOKEN_KEY);
-    if (cached) setToken(cached);
-  }, []);
-
-  useEffect(() => {
-    if (!token) return;
     fetch('/api/admin/patients', {
       headers: { 'X-Receptionist-Token': token },
     })
@@ -45,8 +41,6 @@ export function ReceptionistConsole() {
       .catch((e) => {
         setError(e instanceof Error ? e.message : 'Failed to load patients');
         setPatients(null);
-        sessionStorage.removeItem(TOKEN_KEY);
-        setToken(null);
       });
   }, [token]);
 
@@ -63,7 +57,6 @@ export function ReceptionistConsole() {
   }, [patients, search]);
 
   async function handleIssue(patient: Patient, poli: Poli, payer: Payer) {
-    if (!token) return;
     setError(null);
     try {
       const res = await fetch('/api/admin/tickets', {
@@ -86,41 +79,6 @@ export function ReceptionistConsole() {
     }
   }
 
-  if (!token) {
-    return (
-      <main className="min-h-screen grid place-items-center p-6 bg-ink-50">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            sessionStorage.setItem(TOKEN_KEY, tokenDraft);
-            setToken(tokenDraft);
-          }}
-          className="card-padded w-full max-w-sm space-y-4"
-        >
-          <Logo />
-          <div>
-            <h1 className="font-display text-xl font-bold text-ink-900">Reception console</h1>
-            <p className="text-sm text-ink-500 mt-1">
-              A reception token is required to issue queue tickets.
-            </p>
-          </div>
-          <input
-            type="text"
-            value={tokenDraft}
-            onChange={(e) => setTokenDraft(e.target.value)}
-            placeholder="Reception token"
-            autoFocus
-            className="w-full rounded-2xl border border-ink-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 outline-none px-4 py-3"
-          />
-          <button type="submit" className="btn-primary w-full">
-            Sign in
-          </button>
-          {error && <div className="text-sm text-alert-700">{error}</div>}
-        </form>
-      </main>
-    );
-  }
-
   return (
     <main className="min-h-screen bg-ink-50">
       <header className="bg-white border-b border-ink-100 px-6 py-3 flex items-center justify-between">
@@ -132,15 +90,9 @@ export function ReceptionistConsole() {
           <Link href="/dashboard" className="btn-ghost text-xs">
             Dashboard
           </Link>
-          <button
-            className="btn-ghost text-xs"
-            onClick={() => {
-              sessionStorage.removeItem(TOKEN_KEY);
-              setToken(null);
-            }}
-          >
-            Sign out
-          </button>
+          <Link href="/" className="btn-ghost text-xs">
+            Home
+          </Link>
         </div>
       </header>
 
