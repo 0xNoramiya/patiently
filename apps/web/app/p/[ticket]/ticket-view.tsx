@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 
 import { Logo } from '@/components/Logo';
@@ -12,6 +12,8 @@ import {
   type TicketDetail,
 } from '@/lib/types';
 import { cn, formatEta } from '@/lib/utils';
+import { JourneyStrip } from './journey-strip';
+import { YourStoryCard } from './your-story-card';
 
 function flagLabel(code: string): string {
   return RED_FLAG_LABELS[code] || code;
@@ -26,6 +28,7 @@ export function TicketView({
 }) {
   const [ticket, setTicket] = useState<TicketDetail>(initial);
   const [queue, setQueue] = useState<QueueState | null>(null);
+  const lastStatusRef = useRef<TicketDetail['status']>(initial.status);
 
   useEffect(() => {
     let mounted = true;
@@ -41,6 +44,57 @@ export function TicketView({
       es.close();
     };
   }, [ticket.poli, ticket.id]);
+
+  // Browser notification when the patient is called in
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('Notification' in window)) return;
+    if (Notification.permission === 'default') {
+      // Best-effort request — browsers gate this behind a user gesture in
+      // some contexts, but most still allow it on first paint.
+      Notification.requestPermission().catch(() => {});
+    }
+  }, []);
+
+  useEffect(() => {
+    const prev = lastStatusRef.current;
+    const next = ticket.status;
+    lastStatusRef.current = next;
+    if (prev === next) return;
+    if (typeof window === 'undefined' || !('Notification' in window)) return;
+    if (Notification.permission !== 'granted') return;
+    if (next === 'in_consultation') {
+      try {
+        new Notification('Patiently — your turn', {
+          body: `Ticket ${ticket.ticket_number}: please head to the consultation room.`,
+          tag: `patiently-${ticket.id}`,
+        });
+      } catch {
+        /* ignore */
+      }
+    } else if (next === 'intake_complete') {
+      try {
+        new Notification('Patiently — your story is in', {
+          body: 'Your doctor is reading the summary now. Stay nearby.',
+          tag: `patiently-ready-${ticket.id}`,
+        });
+      } catch {
+        /* ignore */
+      }
+    }
+  }, [ticket.status, ticket.ticket_number, ticket.id]);
+
+  // Reflect current status in the document title so backgrounded tabs nag.
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const base = `${ticket.ticket_number} · Patiently`;
+    if (ticket.status === 'in_consultation') {
+      document.title = `🟢 Your turn — ${base}`;
+    } else if (ticket.status === 'intake_complete') {
+      document.title = `⏳ Story sent — ${base}`;
+    } else {
+      document.title = base;
+    }
+  }, [ticket.status, ticket.ticket_number]);
 
   const meEntry = useMemo(() => {
     if (!queue) return null;
@@ -66,6 +120,12 @@ export function TicketView({
       </header>
 
       <section className="px-5">
+        <div className="mb-5">
+          <JourneyStrip
+            status={ticket.status}
+            intakeComplete={ticket.intake_complete}
+          />
+        </div>
         {ticket.is_followup && (
           <div className="card-padded mb-4 bg-brand-50 border-brand-200">
             <div className="flex items-start gap-3">
@@ -184,8 +244,17 @@ export function TicketView({
           )}
         </div>
 
+        {ticket.intake_complete && <YourStoryCard ticketId={ticket.id} />}
+
         <p className="text-xs text-ink-400 text-center mt-8">
           This page updates automatically. Keep it open.
+          {typeof window !== 'undefined' &&
+            'Notification' in window &&
+            Notification.permission === 'granted' && (
+              <span className="block mt-1 text-brand-700">
+                ✓ You'll get a notification when it's your turn.
+              </span>
+            )}
         </p>
       </section>
     </main>
