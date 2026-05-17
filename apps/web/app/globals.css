@@ -68,3 +68,36 @@ html, body {
   40% { opacity: 1; }
 }
 .typing-dot { animation: shimmer-dots 1.2s infinite ease-in-out; }
+
+@keyframes vital-row-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.vital-row-in { animation: vital-row-in 360ms cubic-bezier(0.4, 0, 0.2, 1) both; }
+
+@keyframes heart-beat {
+  0%, 100% { transform: scale(1); }
+  18%      { transform: scale(1.22); }
+  38%      { transform: scale(1.00); }
+  55%      { transform: scale(1.10); }
+  75%      { transform: scale(1.00); }
+}
+.heart-beat {
+  animation: heart-beat var(--hr-duration, 0.85s) ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes vital-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
+.vital-pulse { animation: vital-pulse 1.6s ease-in-out infinite; }
+
+@keyframes breath-wave {
+  0%, 100% { transform: scaleX(0.85); }
+  50%      { transform: scaleX(1.15); }
+}
+.breath-wave {
+  animation: breath-wave var(--rr-duration, 3.5s) ease-in-out infinite;
+  transform-origin: left center;
+}
