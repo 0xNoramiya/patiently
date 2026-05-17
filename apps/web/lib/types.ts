@@ -195,6 +195,20 @@ export interface ConsultationTranscriptOut {
   completed_at: string | null;
 }
 
+export interface PrescriptionDraftOut {
+  id: string;
+  ticket_id: string;
+  drug_name: string;
+  dose: string;
+  frequency: string;
+  duration_days: number;
+  instructions: string | null;
+  rationale: string | null;
+  source: string;
+  approved: boolean;
+  created_at: string | null;
+}
+
 export interface VitalSignsOut {
   id: string;
   ticket_id: string;

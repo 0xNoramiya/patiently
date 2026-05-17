@@ -44,6 +44,7 @@ from app.core.config import get_settings
 from app.core.db import SessionLocal
 from app.models.intake import IntakeSession
 from app.models.note import ConsultationNote, NoteStatus
+from app.models.prescription_draft import PrescriptionDraft
 from app.models.queue_ticket import QueueTicket
 from app.models.transcript import ConsultationTranscript, TranscriptStatus
 from app.models.vital_signs import VitalSigns
@@ -158,6 +159,17 @@ async def _latest_transcript(
         .limit(1)
     )
     return (await db.execute(stmt)).scalar_one_or_none()
+
+
+async def _prescriptions(
+    db: AsyncSession, ticket_id: uuid.UUID
+) -> list[PrescriptionDraft]:
+    stmt = (
+        select(PrescriptionDraft)
+        .where(PrescriptionDraft.ticket_id == ticket_id)
+        .order_by(PrescriptionDraft.created_at)
+    )
+    return list((await db.execute(stmt)).scalars().all())
 
 
 async def _latest_note(
@@ -367,6 +379,7 @@ async def build_pdf(ticket_id: uuid.UUID) -> tuple[bytes, str]:
         vitals = await _vitals(db, ticket_id)
         transcript = await _latest_transcript(db, ticket_id)
         note = await _latest_note(db, ticket_id)
+        prescriptions = await _prescriptions(db, ticket_id)
         summary = (
             ticket.intake_session.summary
             if ticket.intake_session and ticket.intake_session.summary
@@ -419,6 +432,57 @@ async def build_pdf(ticket_id: uuid.UUID) -> tuple[bytes, str]:
                 Paragraph(
                     f"<i>Drafted by {_esc(note.model_used)} · physician must "
                     "review and sign before this becomes the medical record.</i>",
+                    styles["small"],
+                )
+            )
+
+    if prescriptions:
+        story.append(Spacer(1, 6))
+        story.append(Paragraph("PRESCRIPTIONS", styles["h2"]))
+        rx_rows = [["Drug", "Dose", "Frequency", "Days", "Status"]]
+        for rx in prescriptions:
+            rx_rows.append(
+                [
+                    rx.drug_name,
+                    rx.dose,
+                    rx.frequency,
+                    str(rx.duration_days),
+                    "Approved" if rx.approved else "Draft",
+                ]
+            )
+        tbl = Table(
+            rx_rows,
+            colWidths=[
+                52 * mm,
+                26 * mm,
+                42 * mm,
+                14 * mm,
+                26 * mm,
+            ],
+        )
+        tbl.setStyle(
+            TableStyle(
+                [
+                    ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                    ("FONTSIZE", (0, 0), (-1, -1), 9),
+                    ("LEADING", (0, 0), (-1, -1), 12),
+                    ("BACKGROUND", (0, 0), (-1, 0), BRAND_50),
+                    ("TEXTCOLOR", (0, 0), (-1, 0), BRAND),
+                    ("BOX", (0, 0), (-1, -1), 0.5, INK_100),
+                    ("INNERGRID", (0, 0), (-1, -1), 0.5, INK_100),
+                    ("LEFTPADDING", (0, 0), (-1, -1), 6),
+                    ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+                    ("TOPPADDING", (0, 0), (-1, -1), 4),
+                    ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+                ]
+            )
+        )
+        story.append(tbl)
+        instructions_lines = [rx for rx in prescriptions if rx.instructions]
+        for rx in instructions_lines:
+            story.append(
+                Paragraph(
+                    f"<b>{_esc(rx.drug_name)}:</b> {_esc(rx.instructions)}",
                     styles["small"],
                 )
             )

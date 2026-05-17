@@ -141,6 +141,30 @@ export const api = {
     const filename = match ? match[1] : `visit-${ticketId}.pdf`;
     return { blob, filename };
   },
+
+  draftPrescriptions: (ticketId: string, password: string) =>
+    http<import('./types').PrescriptionDraftOut[]>(
+      `/api/admin/tickets/${ticketId}/prescriptions/draft`,
+      { method: 'POST', headers: { 'X-Admin-Password': password } }
+    ),
+  listPrescriptions: (ticketId: string, password: string) =>
+    http<import('./types').PrescriptionDraftOut[]>(
+      `/api/admin/tickets/${ticketId}/prescriptions`,
+      { headers: { 'X-Admin-Password': password } }
+    ),
+  approvePrescription: (
+    prescriptionId: string,
+    approved: boolean,
+    password: string
+  ) =>
+    http<import('./types').PrescriptionDraftOut>(
+      `/api/admin/prescriptions/${prescriptionId}/approve`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ approved }),
+        headers: { 'X-Admin-Password': password },
+      }
+    ),
 };
 
 export function streamUrl(path: string): string {

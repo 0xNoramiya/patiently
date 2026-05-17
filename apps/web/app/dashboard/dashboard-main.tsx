@@ -15,6 +15,7 @@ import {
 } from '@/lib/types';
 import { cn, formatRelative } from '@/lib/utils';
 import { NotesWidget } from './notes-widget';
+import { PrescriptionsWidget } from './prescriptions-widget';
 import { RemindersPanel } from './reminders-panel';
 import { StatsStrip } from './stats-strip';
 import { TranscriptWidget } from './transcript-widget';
@@ -644,6 +645,11 @@ function DetailPane({
           />
 
           <NotesWidget
+            ticketId={ticket.id}
+            adminPassword={adminPassword}
+          />
+
+          <PrescriptionsWidget
             ticketId={ticket.id}
             adminPassword={adminPassword}
           />

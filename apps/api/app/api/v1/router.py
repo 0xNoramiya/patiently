@@ -5,6 +5,7 @@ from app.api.v1 import (
     exports,
     intake,
     notes,
+    prescriptions,
     queue,
     reminders,
     stats,
@@ -22,3 +23,4 @@ api_router.include_router(notes.router, tags=["notes"])
 api_router.include_router(stats.router, tags=["stats"])
 api_router.include_router(vitals.router, tags=["vitals"])
 api_router.include_router(exports.router, tags=["exports"])
+api_router.include_router(prescriptions.router, tags=["prescriptions"])
