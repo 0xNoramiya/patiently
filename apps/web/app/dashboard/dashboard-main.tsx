@@ -545,6 +545,7 @@ function DetailPane({
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <ExportPdfButton ticketId={ticket.id} adminPassword={adminPassword} />
             {ticket.status !== 'in_consultation' && ticket.status !== 'done' && (
               <button
                 onClick={onCall}
@@ -813,6 +814,56 @@ function FollowUpCard({
         </div>
       )}
     </Card>
+  );
+}
+
+function ExportPdfButton({
+  ticketId,
+  adminPassword,
+}: {
+  ticketId: string;
+  adminPassword: string;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleClick() {
+    setBusy(true);
+    setError(null);
+    try {
+      const { blob, filename } = await api.exportPdf(ticketId, adminPassword);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'export failed');
+      setTimeout(() => setError(null), 4000);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="relative">
+      <button
+        onClick={handleClick}
+        disabled={busy}
+        className="btn-secondary text-sm"
+        title="Download the full visit chart as PDF"
+      >
+        {busy ? 'Exporting…' : '⤓ PDF'}
+      </button>
+      {error && (
+        <div className="absolute right-0 top-full mt-1 text-[10px] text-alert-700 bg-alert-50 border border-alert-100 rounded px-2 py-1 whitespace-nowrap z-10">
+          {error}
+        </div>
+      )}
+    </div>
   );
 }
 

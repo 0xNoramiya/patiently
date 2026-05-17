@@ -121,6 +121,26 @@ export const api = {
         headers: { 'X-Admin-Password': password },
       }
     ),
+
+  exportPdf: async (
+    ticketId: string,
+    password: string
+  ): Promise<{ blob: Blob; filename: string }> => {
+    const base = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '') || '';
+    const res = await fetch(
+      `${base}/api/admin/tickets/${ticketId}/export/pdf`,
+      { headers: { 'X-Admin-Password': password }, cache: 'no-store' }
+    );
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`API ${res.status}: ${text || res.statusText}`);
+    }
+    const blob = await res.blob();
+    const cd = res.headers.get('content-disposition') || '';
+    const match = cd.match(/filename="([^"]+)"/);
+    const filename = match ? match[1] : `visit-${ticketId}.pdf`;
+    return { blob, filename };
+  },
 };
 
 export function streamUrl(path: string): string {

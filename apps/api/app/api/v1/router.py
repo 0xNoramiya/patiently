@@ -2,6 +2,7 @@ from fastapi import APIRouter
 
 from app.api.v1 import (
     admin,
+    exports,
     intake,
     notes,
     queue,
@@ -20,3 +21,4 @@ api_router.include_router(transcripts.router, tags=["transcripts"])
 api_router.include_router(notes.router, tags=["notes"])
 api_router.include_router(stats.router, tags=["stats"])
 api_router.include_router(vitals.router, tags=["vitals"])
+api_router.include_router(exports.router, tags=["exports"])
