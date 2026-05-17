@@ -310,6 +310,16 @@ ETA is the rolling average of the last 20 completed consultations in the last 24
 
 Patiently is a prototype for educational and demo purposes. It does not provide medical advice or diagnosis. All clinical decisions remain with the attending physician. Differentials and suggested questions are clearly labelled as system suggestions, not diagnoses.
 
+## Running the tests
+
+```bash
+cd apps/api
+.venv/bin/pip install pytest
+.venv/bin/python -m pytest -q tests/
+```
+
+The CI workflow at `.github/workflows/ci.yml` runs the same suite on every push and pull request, plus an import smoke test on the API and a full `next build` of the web app.
+
 ## License
 
 MIT.
