@@ -14,6 +14,7 @@ import {
 import { cn, formatEta } from '@/lib/utils';
 import { InstallPrompt } from '@/components/InstallPrompt';
 import { JourneyStrip } from './journey-strip';
+import { TriageReassurance } from './triage-reassurance';
 import { YourStoryCard } from './your-story-card';
 
 function flagLabel(code: string): string {
@@ -162,13 +163,11 @@ export function TicketView({
         )}
 
         {isUrgent && (
-          <div className="card-padded mb-4 bg-alert-50 border-alert-100">
-            <div className="text-xs uppercase tracking-wide text-alert-700 font-semibold">
-              Priority escalated
-            </div>
-            <div className="text-sm text-ink-700 mt-1">
-              The clinical team has been notified. You'll be seen shortly.
-            </div>
+          <div className="mb-4">
+            <TriageReassurance
+              flags={ticket.triage_flags}
+              ticketNumber={ticket.ticket_number}
+            />
           </div>
         )}
 
