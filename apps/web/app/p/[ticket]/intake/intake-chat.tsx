@@ -8,6 +8,7 @@ import { Logo } from '@/components/Logo';
 import { api } from '@/lib/api';
 import type { IntakeMessage, IntakeSession, TicketDetail } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { ExtractedChips } from './extracted-chips';
 
 interface Props {
   ticket: TicketDetail;
@@ -156,9 +157,16 @@ export function IntakeChat({ ticket, poliLabel }: Props) {
       </div>
 
       {!completed && (
-        <div className="px-4 py-3 border-t border-ink-100 bg-white sticky bottom-0">
-          <div className="flex items-end gap-2">
-            <textarea
+        <div className="sticky bottom-0">
+          {session?.structured_data && Object.keys(session.structured_data).length > 0 && (
+            <ExtractedChips
+              data={session.structured_data}
+              isFollowup={ticket.is_followup}
+            />
+          )}
+          <div className="px-4 py-3 border-t border-ink-100 bg-white">
+            <div className="flex items-end gap-2">
+              <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => {
@@ -186,17 +194,18 @@ export function IntakeChat({ ticket, poliLabel }: Props) {
               </svg>
             </button>
           </div>
-          <div className="flex items-center justify-between mt-2">
-            <span className="text-[11px] text-ink-400">
-              Enter to send · Shift+Enter for a new line
-            </span>
-            <button
-              onClick={handleForceComplete}
-              disabled={sending || starting}
-              className="text-xs text-ink-500 hover:text-ink-700 underline"
-            >
-              I'm done
-            </button>
+            <div className="flex items-center justify-between mt-2">
+              <span className="text-[11px] text-ink-400">
+                Enter to send · Shift+Enter for a new line
+              </span>
+              <button
+                onClick={handleForceComplete}
+                disabled={sending || starting}
+                className="text-xs text-ink-500 hover:text-ink-700 underline"
+              >
+                I'm done
+              </button>
+            </div>
           </div>
         </div>
       )}
